@@ -95,3 +95,15 @@ lc_quicksort([Pivot|Rest]) ->
     lc_quicksort([Smaller || Smaller <-Rest, Smaller =< Pivot])
     ++ [Pivot] ++
     lc_quicksort([Greater || Greater <-Rest, Greater >= Pivot]).
+
+
+
+% since base case is:
+% S0 = (Fib0, Fib1) = (0, 1)
+% for n >= 1 succ(Fibn-1, Fibn) = (Fibn, Fibn+1) = (Fibn, Fibn-1 + Fibn)
+
+
+fibo_tail(0, Result, _Next) -> Result;
+fibo_tail(N, Result, Next) when N > 0 -> fibo_tail(N-1, Next, Result + Next).
+fibo(N) -> fibo_tail(N, 0, 1).
+
