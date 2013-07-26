@@ -1,0 +1,22 @@
+// DB IDL
+#ifndef _DB_IDL_
+#define _DB_IDL_
+
+module JobService {
+		
+		struct job {
+				string Title;
+		};
+
+		typedef job JobEntitiy;
+
+		enum Status {success, fail};
+		
+		interface JobHandler {
+		
+				Status handle_job(in JobEntitiy JobCtx);
+		
+		};
+};
+
+#endif

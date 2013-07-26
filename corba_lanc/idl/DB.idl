@@ -1,0 +1,39 @@
+// DB IDL
+#ifndef _DB_IDL_
+#define _DB_IDL_
+
+module DB {
+	
+	typedef unsigned long EmployeeNo;
+
+	enum Department {Department1, Department2};
+
+	struct employee {
+			EmployeeNo No;
+			string Name;
+			string Address;
+			Department Dpt;
+	};
+
+	typedef employee EmployeeData;
+
+	interface CommonUser {
+			EmployeeData lookup(in EmployeeNo ENo);
+	};
+
+	interface Administrator : CommonUser {
+			void delete(in EmployeeNo ENo);
+	};
+
+	interface Access {
+
+			typedef string<10> UserID;
+			typedef string<10> Password;
+
+			CommonUser logon(in UserID ID, in Password PW);
+
+	};
+
+};
+
+#endif
