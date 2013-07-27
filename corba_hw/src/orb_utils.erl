@@ -18,3 +18,5 @@ gen_impl_modules(FName, OutDir) ->
 				error -> io:format("Error while gen template impl modules.")
 	
 		end.
+
+		
