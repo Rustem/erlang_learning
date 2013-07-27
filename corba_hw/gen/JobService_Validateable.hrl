@@ -2,7 +2,7 @@
 %%
 %% Erlang header file
 %% 
-%% Target: JobService
+%% Target: JobService_Validateable
 %% Source: idl/JobService.idl
 %% IC vsn: 4.2.27
 %% 
@@ -11,11 +11,10 @@
 %%------------------------------------------------------------
 
 
--ifndef(JOBSERVICE_HRL).
--define(JOBSERVICE_HRL, true).
+-ifndef(JOBSERVICE_VALIDATEABLE_HRL).
+-define(JOBSERVICE_VALIDATEABLE_HRL, true).
 
 
--record('JobService_job', {title, salary, currency, country, reqments, job_details}).
 
 
 -endif.

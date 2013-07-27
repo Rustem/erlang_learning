@@ -2,7 +2,7 @@
 %%
 %% Implementation stub file
 %% 
-%% Target: JobService_JobHandler
+%% Target: JobService_Validateable
 %% Source: idl/JobService.idl
 %% IC vsn: 4.2.27
 %% 
@@ -10,11 +10,14 @@
 %%
 %%------------------------------------------------------------
 
--module('JobService_JobHandler').
+-module('JobService_Validateable').
 -ic_compiled("4_2_27").
 
 
 %% Interface functions
+-export([validate_job/2, validate_job/3]).
+
+%% Exports from "JobService::JobHandler"
 -export(['_get_hname'/1, '_get_hname'/2, '_set_hname'/2]).
 -export(['_set_hname'/3]).
 
@@ -44,6 +47,16 @@
 
 
 
+%%%% Operation: validate_job
+%% 
+%%   Returns: RetVal, JobCtx
+%%
+validate_job(OE_THIS, JobCtx) ->
+    corba:call(OE_THIS, validate_job, [JobCtx], ?MODULE).
+
+validate_job(OE_THIS, OE_Options, JobCtx) ->
+    corba:call(OE_THIS, validate_job, [JobCtx], ?MODULE, OE_Options).
+
 %%%% Operation: '_get_hname'
 %% 
 %%   Returns: RetVal
@@ -69,6 +82,7 @@
 %% Inherited Interfaces
 %%
 %%------------------------------------------------------------
+oe_is_a("IDL:JobService/Validateable:1.0") -> true;
 oe_is_a("IDL:JobService/JobHandler:1.0") -> true;
 oe_is_a(_) -> false.
 
@@ -77,15 +91,44 @@ oe_is_a(_) -> false.
 %% Interface TypeCode
 %%
 %%------------------------------------------------------------
-oe_tc('_get_hname') -> 
-	{{tk_string,20},[],[]};
-oe_tc('_set_hname') -> 
-	{tk_void,[{tk_string,20}],[]};
+oe_tc(validate_job) -> 
+	{{tk_enum,"IDL:JobService/Status:1.0","Status",["success","fail"]},
+         [{tk_struct,"IDL:JobService/job:1.0","job",
+                     [{"title",{tk_string,0}},
+                      {"salary",tk_ulong},
+                      {"currency",
+                       {tk_enum,"IDL:JobService/JobGeoDetails/CurrencyEnum:1.0",
+                                "CurrencyEnum",
+                                ["kzt","usd","rub","gbp"]}},
+                      {"country",
+                       {tk_enum,"IDL:JobService/JobGeoDetails/CountryEnum:1.0",
+                                "CountryEnum",
+                                ["kazakhstan","russia","great_britain",
+                                 "usa"]}},
+                      {"reqments",{tk_sequence,{tk_string,146},4}},
+                      {"job_details",{tk_sequence,{tk_string,146},4}}]}],
+         [{tk_struct,"IDL:JobService/job:1.0","job",
+                     [{"title",{tk_string,0}},
+                      {"salary",tk_ulong},
+                      {"currency",
+                       {tk_enum,"IDL:JobService/JobGeoDetails/CurrencyEnum:1.0",
+                                "CurrencyEnum",
+                                ["kzt","usd","rub","gbp"]}},
+                      {"country",
+                       {tk_enum,"IDL:JobService/JobGeoDetails/CountryEnum:1.0",
+                                "CountryEnum",
+                                ["kazakhstan","russia","great_britain",
+                                 "usa"]}},
+                      {"reqments",{tk_sequence,{tk_string,146},4}},
+                      {"job_details",{tk_sequence,{tk_string,146},4}}]}]};
+oe_tc('_get_hname') -> 'JobService_JobHandler':oe_tc('_get_hname');
+oe_tc('_set_hname') -> 'JobService_JobHandler':oe_tc('_set_hname');
 oe_tc(_) -> undefined.
 
 oe_get_interface() -> 
-	[{"_get_hname", oe_tc('_get_hname')},
-	{"_set_hname", oe_tc('_set_hname')}].
+	[{"_get_hname", 'JobService_JobHandler':oe_tc('_get_hname')},
+	{"_set_hname", 'JobService_JobHandler':oe_tc('_set_hname')},
+	{"validate_job", oe_tc(validate_job)}].
 
 
 
@@ -104,7 +147,7 @@ oe_get_interface() ->
 %%------------------------------------------------------------
 
 typeID() ->
-    "IDL:JobService/JobHandler:1.0".
+    "IDL:JobService/Validateable:1.0".
 
 
 %%------------------------------------------------------------
@@ -114,22 +157,22 @@ typeID() ->
 %%------------------------------------------------------------
 
 oe_create() ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0").
+    corba:create(?MODULE, "IDL:JobService/Validateable:1.0").
 
 oe_create_link() ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0").
+    corba:create_link(?MODULE, "IDL:JobService/Validateable:1.0").
 
 oe_create(Env) ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0", Env).
+    corba:create(?MODULE, "IDL:JobService/Validateable:1.0", Env).
 
 oe_create_link(Env) ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0", Env).
+    corba:create_link(?MODULE, "IDL:JobService/Validateable:1.0", Env).
 
 oe_create(Env, RegName) ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0", Env, RegName).
+    corba:create(?MODULE, "IDL:JobService/Validateable:1.0", Env, RegName).
 
 oe_create_link(Env, RegName) ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0", Env, RegName).
+    corba:create_link(?MODULE, "IDL:JobService/Validateable:1.0", Env, RegName).
 
 %%------------------------------------------------------------
 %%
@@ -139,25 +182,32 @@ oe_create_link(Env, RegName) ->
 
 init(Env) ->
 %% Call to implementation init
-    corba:handle_init('JobService_JobHandler_impl', Env).
+    corba:handle_init('JobService_Validateable_impl', Env).
 
 terminate(Reason, State) ->
-    corba:handle_terminate('JobService_JobHandler_impl', Reason, State).
+    corba:handle_terminate('JobService_Validateable_impl', Reason, State).
 
+
+%%%% Operation: validate_job
+%% 
+%%   Returns: RetVal, JobCtx
+%%
+handle_call({_, OE_Context, validate_job, [JobCtx]}, _, OE_State) ->
+  corba:handle_call('JobService_Validateable_impl', validate_job, [JobCtx], OE_State, OE_Context, false, false);
 
 %%%% Operation: '_get_hname'
 %% 
 %%   Returns: RetVal
 %%
 handle_call({_, OE_Context, '_get_hname', []}, _, OE_State) ->
-  corba:handle_call('JobService_JobHandler_impl', '_get_hname', [], OE_State, OE_Context, false, false);
+  corba:handle_call('JobService_Validateable_impl', '_get_hname', [], OE_State, OE_Context, false, false);
 
 %%%% Operation: '_set_hname'
 %% 
 %%   Returns: RetVal
 %%
 handle_call({_, OE_Context, '_set_hname', [OE_Value]}, _, OE_State) ->
-  corba:handle_call('JobService_JobHandler_impl', '_set_hname', [OE_Value], OE_State, OE_Context, false, false);
+  corba:handle_call('JobService_Validateable_impl', '_set_hname', [OE_Value], OE_State, OE_Context, false, false);
 
 
 
@@ -186,5 +236,5 @@ handle_info(_, State) ->
 
 
 code_change(OldVsn, State, Extra) ->
-    corba:handle_code_change('JobService_JobHandler_impl', OldVsn, State, Extra).
+    corba:handle_code_change('JobService_Validateable_impl', OldVsn, State, Extra).
 

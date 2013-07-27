@@ -2,7 +2,7 @@
 %%
 %% Implementation stub file
 %% 
-%% Target: JobService_JobHandler
+%% Target: JobService_JobHandlers
 %% Source: idl/JobService.idl
 %% IC vsn: 4.2.27
 %% 
@@ -10,13 +10,11 @@
 %%
 %%------------------------------------------------------------
 
--module('JobService_JobHandler').
+-module('JobService_JobHandlers').
 -ic_compiled("4_2_27").
 
 
 %% Interface functions
--export(['_get_hname'/1, '_get_hname'/2, '_set_hname'/2]).
--export(['_set_hname'/3]).
 
 %% Type identification function
 -export([typeID/0]).
@@ -44,32 +42,12 @@
 
 
 
-%%%% Operation: '_get_hname'
-%% 
-%%   Returns: RetVal
-%%
-'_get_hname'(OE_THIS) ->
-    corba:call(OE_THIS, '_get_hname', [], ?MODULE).
-
-'_get_hname'(OE_THIS, OE_Options) ->
-    corba:call(OE_THIS, '_get_hname', [], ?MODULE, OE_Options).
-
-%%%% Operation: '_set_hname'
-%% 
-%%   Returns: RetVal
-%%
-'_set_hname'(OE_THIS, OE_Value) ->
-    corba:call(OE_THIS, '_set_hname', [OE_Value], ?MODULE).
-
-'_set_hname'(OE_THIS, OE_Options, OE_Value) ->
-    corba:call(OE_THIS, '_set_hname', [OE_Value], ?MODULE, OE_Options).
-
 %%------------------------------------------------------------
 %%
 %% Inherited Interfaces
 %%
 %%------------------------------------------------------------
-oe_is_a("IDL:JobService/JobHandler:1.0") -> true;
+oe_is_a("IDL:JobService/JobHandlers:1.0") -> true;
 oe_is_a(_) -> false.
 
 %%------------------------------------------------------------
@@ -77,15 +55,10 @@ oe_is_a(_) -> false.
 %% Interface TypeCode
 %%
 %%------------------------------------------------------------
-oe_tc('_get_hname') -> 
-	{{tk_string,20},[],[]};
-oe_tc('_set_hname') -> 
-	{tk_void,[{tk_string,20}],[]};
 oe_tc(_) -> undefined.
 
 oe_get_interface() -> 
-	[{"_get_hname", oe_tc('_get_hname')},
-	{"_set_hname", oe_tc('_set_hname')}].
+	[].
 
 
 
@@ -104,7 +77,7 @@ oe_get_interface() ->
 %%------------------------------------------------------------
 
 typeID() ->
-    "IDL:JobService/JobHandler:1.0".
+    "IDL:JobService/JobHandlers:1.0".
 
 
 %%------------------------------------------------------------
@@ -114,22 +87,22 @@ typeID() ->
 %%------------------------------------------------------------
 
 oe_create() ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0").
+    corba:create(?MODULE, "IDL:JobService/JobHandlers:1.0").
 
 oe_create_link() ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0").
+    corba:create_link(?MODULE, "IDL:JobService/JobHandlers:1.0").
 
 oe_create(Env) ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0", Env).
+    corba:create(?MODULE, "IDL:JobService/JobHandlers:1.0", Env).
 
 oe_create_link(Env) ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0", Env).
+    corba:create_link(?MODULE, "IDL:JobService/JobHandlers:1.0", Env).
 
 oe_create(Env, RegName) ->
-    corba:create(?MODULE, "IDL:JobService/JobHandler:1.0", Env, RegName).
+    corba:create(?MODULE, "IDL:JobService/JobHandlers:1.0", Env, RegName).
 
 oe_create_link(Env, RegName) ->
-    corba:create_link(?MODULE, "IDL:JobService/JobHandler:1.0", Env, RegName).
+    corba:create_link(?MODULE, "IDL:JobService/JobHandlers:1.0", Env, RegName).
 
 %%------------------------------------------------------------
 %%
@@ -139,25 +112,11 @@ oe_create_link(Env, RegName) ->
 
 init(Env) ->
 %% Call to implementation init
-    corba:handle_init('JobService_JobHandler_impl', Env).
+    corba:handle_init('JobService_JobHandlers_impl', Env).
 
 terminate(Reason, State) ->
-    corba:handle_terminate('JobService_JobHandler_impl', Reason, State).
+    corba:handle_terminate('JobService_JobHandlers_impl', Reason, State).
 
-
-%%%% Operation: '_get_hname'
-%% 
-%%   Returns: RetVal
-%%
-handle_call({_, OE_Context, '_get_hname', []}, _, OE_State) ->
-  corba:handle_call('JobService_JobHandler_impl', '_get_hname', [], OE_State, OE_Context, false, false);
-
-%%%% Operation: '_set_hname'
-%% 
-%%   Returns: RetVal
-%%
-handle_call({_, OE_Context, '_set_hname', [OE_Value]}, _, OE_State) ->
-  corba:handle_call('JobService_JobHandler_impl', '_set_hname', [OE_Value], OE_State, OE_Context, false, false);
 
 
 
@@ -186,5 +145,5 @@ handle_info(_, State) ->
 
 
 code_change(OldVsn, State, Extra) ->
-    corba:handle_code_change('JobService_JobHandler_impl', OldVsn, State, Extra).
+    corba:handle_code_change('JobService_JobHandlers_impl', OldVsn, State, Extra).
 

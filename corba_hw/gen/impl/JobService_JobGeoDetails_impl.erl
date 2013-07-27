@@ -4,7 +4,7 @@
 %%     $Id$
 %%
 %%----------------------------------------------------------------------
-%% Module       : JobService_JobHandler_impl.erl
+%% Module       : JobService_JobGeoDetails_impl.erl
 %% 
 %% Source       : idl/JobService.idl
 %% 
@@ -13,9 +13,8 @@
 %% Creation date: 2013-07-27
 %%
 %%----------------------------------------------------------------------
--module('JobService_JobHandler_impl').
+-module('JobService_JobGeoDetails_impl').
 
--export(['_get_hname'/1, '_set_hname'/2]).
 
 %%----------------------------------------------------------------------
 %% Internal Exports
@@ -43,28 +42,6 @@
 %%======================================================================
 %% API Functions
 %%======================================================================
-%%----------------------------------------------------------------------
-%% Function   : '_get_hname'/1
-%% Arguments  : State - term()
-%% Returns    : ReturnValue = Hname
-%%              Hname = String()
-%% Raises     : 
-%% Description: 
-%%----------------------------------------------------------------------
-'_get_hname'(State) ->
-	{reply, Hname, State}.
-
-%%----------------------------------------------------------------------
-%% Function   : '_set_hname'/2
-%% Arguments  : State - term()
-%%              Hname = String()
-%% Returns    : ReturnValue = ok
-%% Raises     : 
-%% Description: 
-%%----------------------------------------------------------------------
-'_set_hname'(State, Hname) ->
-	{reply, ok, State}.
-
 %%======================================================================
 %% Internal Functions
 %%======================================================================

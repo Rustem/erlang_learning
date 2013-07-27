@@ -4,7 +4,7 @@
 %%     $Id$
 %%
 %%----------------------------------------------------------------------
-%% Module       : JobService_JobHandler_impl.erl
+%% Module       : JobService_Validateable_impl.erl
 %% 
 %% Source       : idl/JobService.idl
 %% 
@@ -13,8 +13,9 @@
 %% Creation date: 2013-07-27
 %%
 %%----------------------------------------------------------------------
--module('JobService_JobHandler_impl').
+-module('JobService_Validateable_impl').
 
+-export([validate_job/2]).
 -export(['_get_hname'/1, '_set_hname'/2]).
 
 %%----------------------------------------------------------------------
@@ -43,6 +44,40 @@
 %%======================================================================
 %% API Functions
 %%======================================================================
+%%----------------------------------------------------------------------
+%% Function   : validate_job/2
+%% Arguments  : State - term()
+%%              JobCtx = #'JobService_job'{title,salary,currency,country,reqments,job_details}
+%%              title = String()
+%%              salary = unsigned_Long()
+%%              currency = CurrencyEnum
+%%              CurrencyEnum = 'kzt' | 'usd' | 'rub' | 'gbp' 
+%%              country = CountryEnum
+%%              CountryEnum = 'kazakhstan' | 'russia' | 'great_britain' | 'usa' 
+%%              reqments = [ reqmentsElem ]
+%%              reqmentsElem = String()
+%%              job_details = [ job_detailsElem ]
+%%              job_detailsElem = String()
+%% Returns    : ReturnValue = {OE_Reply, JobCtx}
+%%              OE_Reply = Status
+%%              Status = 'success' | 'fail' 
+%%              JobCtx = #'JobService_job'{title,salary,currency,country,reqments,job_details}
+%%              title = String()
+%%              salary = unsigned_Long()
+%%              currency = CurrencyEnum
+%%              CurrencyEnum = 'kzt' | 'usd' | 'rub' | 'gbp' 
+%%              country = CountryEnum
+%%              CountryEnum = 'kazakhstan' | 'russia' | 'great_britain' | 'usa' 
+%%              reqments = [ reqmentsElem ]
+%%              reqmentsElem = String()
+%%              job_details = [ job_detailsElem ]
+%%              job_detailsElem = String()
+%% Raises     : 
+%% Description: 
+%%----------------------------------------------------------------------
+validate_job(State, JobCtx) ->
+	{reply, {OE_Reply, JobCtx}, State}.
+
 %%----------------------------------------------------------------------
 %% Function   : '_get_hname'/1
 %% Arguments  : State - term()

@@ -21,7 +21,19 @@
 
 
 %% returns type code
-tc() -> {tk_struct,"IDL:JobService/job:1.0","job",[{"Title",{tk_string,0}}]}.
+tc() -> {tk_struct,"IDL:JobService/job:1.0","job",
+                   [{"title",{tk_string,0}},
+                    {"salary",tk_ulong},
+                    {"currency",
+                     {tk_enum,"IDL:JobService/JobGeoDetails/CurrencyEnum:1.0",
+                              "CurrencyEnum",
+                              ["kzt","usd","rub","gbp"]}},
+                    {"country",
+                     {tk_enum,"IDL:JobService/JobGeoDetails/CountryEnum:1.0",
+                              "CountryEnum",
+                              ["kazakhstan","russia","great_britain","usa"]}},
+                    {"reqments",{tk_sequence,{tk_string,146},4}},
+                    {"job_details",{tk_sequence,{tk_string,146},4}}]}.
 
 %% returns id
 id() -> "IDL:JobService/job:1.0".

@@ -4,18 +4,43 @@
 
 module JobService {
 		
+		interface JobGeoDetails {
+				enum CurrencyEnum {kzt, usd, rub, gbp};
+				enum CountryEnum {kazakhstan, russia, great_britain, usa};
+		};
+		
 		struct job {
-				string Title;
+				string title;
+				unsigned long salary;
+				JobGeoDetails::CurrencyEnum currency;
+				JobGeoDetails::CountryEnum country;
+				sequence <string<146>, 4> reqments;
+				sequence <string<146>, 4> job_details;
 		};
 
 		typedef job JobEntitiy;
 
 		enum Status {success, fail};
-		
+
 		interface JobHandler {
-		
-				Status handle_job(in JobEntitiy JobCtx);
-		
+				attribute string<20> hname;
+		};
+
+
+		interface Submitable : JobHandler {
+				Status submit_job(in JobEntitiy JobCtx);
+		};
+
+		interface Validateable : JobHandler {
+				Status validate_job(inout JobEntitiy JobCtx);
+		};
+
+		interface Processable : JobHandler {
+				Status process_job(inout JobEntitiy JobCtx);
+		};
+
+		interface Storeable : JobHandler {
+				Status store_job(in JobEntitiy JobCtx);
 		};
 };
 
