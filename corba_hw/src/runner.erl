@@ -2,6 +2,13 @@
 -compile(export_all).
 -include("../gen/JobService.hrl").
 
+% NOTE. Launch servers (Job Handlers)
+% NOTE. Implement handlers
+% NOTE. Support pipelining {submit: ObjRef1, validate: ObjRef2} in Env
+% NOTE. Supervise and restart in case of failure
+% NOTE. Support pubsub
+
+
 launch_app(DomainName) ->
 		launch_orber(DomainName),
 		oe_JobService:oe_register().
