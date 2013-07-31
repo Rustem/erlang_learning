@@ -50,6 +50,7 @@
 %%%% Operation: process_job
 %% 
 %%   Returns: RetVal, JobCtx
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 process_job(OE_THIS, JobCtx) ->
     corba:call(OE_THIS, process_job, [JobCtx], ?MODULE).
@@ -191,6 +192,7 @@ terminate(Reason, State) ->
 %%%% Operation: process_job
 %% 
 %%   Returns: RetVal, JobCtx
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 handle_call({_, OE_Context, process_job, [JobCtx]}, _, OE_State) ->
   corba:handle_call('JobService_Processable_impl', process_job, [JobCtx], OE_State, OE_Context, false, false);

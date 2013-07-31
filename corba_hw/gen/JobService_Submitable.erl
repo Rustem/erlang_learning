@@ -50,6 +50,7 @@
 %%%% Operation: submit_job
 %% 
 %%   Returns: RetVal
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 submit_job(OE_THIS, JobCtx) ->
     corba:call(OE_THIS, submit_job, [JobCtx], ?MODULE).
@@ -178,6 +179,7 @@ terminate(Reason, State) ->
 %%%% Operation: submit_job
 %% 
 %%   Returns: RetVal
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 handle_call({_, OE_Context, submit_job, [JobCtx]}, _, OE_State) ->
   corba:handle_call('JobService_Submitable_impl', submit_job, [JobCtx], OE_State, OE_Context, false, false);

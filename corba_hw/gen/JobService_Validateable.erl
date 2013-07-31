@@ -50,6 +50,7 @@
 %%%% Operation: validate_job
 %% 
 %%   Returns: RetVal, JobCtx
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 validate_job(OE_THIS, JobCtx) ->
     corba:call(OE_THIS, validate_job, [JobCtx], ?MODULE).
@@ -191,6 +192,7 @@ terminate(Reason, State) ->
 %%%% Operation: validate_job
 %% 
 %%   Returns: RetVal, JobCtx
+%%   Raises:  JobService::HandlerNotRegistered
 %%
 handle_call({_, OE_Context, validate_job, [JobCtx]}, _, OE_State) ->
   corba:handle_call('JobService_Validateable_impl', validate_job, [JobCtx], OE_State, OE_Context, false, false);

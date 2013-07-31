@@ -40,6 +40,7 @@
 %%----------------------------------------------------------------------
 -record(state, {}).
 
+-define(SERVICE_NAME, "JobHandler").
 %%======================================================================
 %% API Functions
 %%======================================================================
@@ -49,10 +50,10 @@
 %% Returns    : ReturnValue = Hname
 %%              Hname = String()
 %% Raises     : 
-%% Description: 
+%% Description: returns Service name of object 
 %%----------------------------------------------------------------------
 '_get_hname'(State) ->
-	{reply, Hname, State}.
+	{reply, ?SERVICE_NAME, State}.
 
 %%----------------------------------------------------------------------
 %% Function   : '_set_hname'/2

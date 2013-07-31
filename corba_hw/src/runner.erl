@@ -1,6 +1,14 @@
 -module(runner).
 -compile(export_all).
 -include("../gen/JobService.hrl").
+-include("records.hrl").
+-define(SUBMIT_SRV, 'JobService_Submitable').
+-define(VALIDATE_SRV, 'JobService_Validateable').
+-define(PROCESS_SRV, 'JobService_Processable').
+-define(STORE_SRV, 'JobService_Storeable').
+
+
+-define(DEFAULT_REGNAME, "JobHandler").
 
 % NOTE. Launch servers (Job Handlers)
 % NOTE. Implement handlers
@@ -36,18 +44,26 @@ reinstall_orber() ->
 		orber:start().
 
 
-client_test() ->
-		NS = corba:resolve_initial_references("NameService"),
-		NC = lname_component:set_id(lname_component:create(), "JobService"),
-		N = lname:insert_component(lname:create(), 1, NC),
-		case catch 'CosNaming_NamingContext':resolve(NS, N) of
-				{'EXCEPTION', E} ->
-						io:format("The job server is not registered.~nDetails: ~p", [E]);
-				JobObj ->
-						FakeJob = #'JobService_job'{'Title'="Do prototype"},
-						Res = 'JobService_JobHandler':handle_job(JobObj, FakeJob),
-						io:format("Job submitted with result: ~p ~n", [Res])
-		end.
+client_test(Env) ->
+		{SrvInfo, SubmitSrvObj} = case commons:get_srv_obj(Env, submit_srv) of
+				{bad, Reason} -> throw(Reason);
+				{ok, Result} -> Result
+		end,
+
+		#service{cosname=CN, stub_module=SM} = SrvInfo,
+
+		FakeJob = #'JobService_job'{
+				title="Do prototype",
+				salary=450000,
+				currency=kzt,
+				country=kazakhstan,
+				reqments=["one", "two", "three", "four"],
+				job_details=["1", "2", "3", "4"]},
+
+		Res = SM:submit_job(
+				SubmitSrvObj, FakeJob),
+		io:format("Job submitted with result: ~p ~n", [Res]).
+
 		% oe_JobService:oe_register(),
 		% Obj = corba:string_to_object(readIOR(IORFile)),
 		% Job=#'JobService_job'{'Title'="Do job"},
@@ -55,12 +71,48 @@ client_test() ->
 		% io:format("JOB HANDLED: ~p~n", [Res]).
 
 server_test() ->
-		JobObj = 'JobService_JobHandler':oe_create(),
+		{ok, Env} = build_env(),
+		io:format("Service initialized with env: ~p", [Env]),
+		Env.
+
+build_env() ->
+		SubmitServiceInfo = #service{
+				cosname=atom_to_list(?SUBMIT_SRV),
+				stub_module=?SUBMIT_SRV,
+				regname=?SUBMIT_SRV},
+		ValidServiceInfo = #service{
+				cosname=atom_to_list(?VALIDATE_SRV),
+				stub_module=?VALIDATE_SRV,
+				regname=?VALIDATE_SRV},
+		ProcessServiceInfo = #service{
+				cosname=atom_to_list(?PROCESS_SRV),
+				stub_module=?PROCESS_SRV,
+				regname=?PROCESS_SRV},
+		StoreServiceInfo = #service{
+				cosname=atom_to_list(?STORE_SRV),
+				stub_module=?STORE_SRV,
+				regname=?STORE_SRV},
+		
+		Env = orddict:from_list([
+				{submit_srv, SubmitServiceInfo},
+				{valid_srv, ValidServiceInfo},
+				{process_srv, ProcessServiceInfo},
+				{store_srv, StoreServiceInfo}
+		]),
+		
+		init_service(SubmitServiceInfo, Env),
+		init_service(ValidServiceInfo, Env),
+		init_service(ProcessServiceInfo, Env),
+		init_service(StoreServiceInfo, Env),
+		{ok, Env}.
+
+init_service(#service{cosname=CosName, stub_module=StubModule, regname=RegName}, Env) ->
+		SrvObjectKey = StubModule:oe_create_link(Env, [{regname, {local, RegName}}]),
 		NS = corba:resolve_initial_references("NameService"),
-		NC = lname_component:set_id(lname_component:create(), "JobService"),
+		NC = lname_component:set_id(lname_component:create(), CosName),
 		N = lname:insert_component(lname:create(), 1, NC),
-		'CosNaming_NamingContext':bind(NS, N, JobObj).
-		% writeIOR(IORFile, corba:object_to_string(Obj)).
+		'CosNaming_NamingContext':bind(NS, N, SrvObjectKey),
+		io:format("Service ~p launched and bind to ~p.~n", [RegName, CosName]).
 
 % writeIOR(FileName, IOR) ->
 % 		{ok, FileDesc} = file:open(FileName, [write]),

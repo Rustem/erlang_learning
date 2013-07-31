@@ -15,6 +15,7 @@
 -define(JOBSERVICE_HRL, true).
 
 
+-record('JobService_HandlerNotRegistered', {'OE_ID'="IDL:JobService/HandlerNotRegistered:1.0"}).
 -record('JobService_job', {title, salary, currency, country, reqments, job_details}).
 
 

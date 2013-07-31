@@ -26,10 +26,13 @@
          code_change/3,
          handle_info/2]).
 
+-define(SERVICE_NAME, "ValidateableJobService").
+
 %%----------------------------------------------------------------------
 %% Include Files
 %%----------------------------------------------------------------------
-
+-include("../JobService.hrl").
+-include("../../src/records.hrl").
 
 %%----------------------------------------------------------------------
 %% Macros
@@ -39,7 +42,6 @@
 %%----------------------------------------------------------------------
 %% Records
 %%----------------------------------------------------------------------
--record(state, {}).
 
 %%======================================================================
 %% API Functions
@@ -75,8 +77,27 @@
 %% Raises     : 
 %% Description: 
 %%----------------------------------------------------------------------
-validate_job(State, JobCtx) ->
-	{reply, {OE_Reply, JobCtx}, State}.
+validate_job(
+				S=#state{services=Services, jobs=Jobs},
+				JobCtx=#'JobService_job'{}) ->
+	ok=validate_job_item(Jobs, JobCtx),
+	JobTitle = JobCtx#'JobService_job'.title,
+	io:format("VALIDATE SERVICE: Job[~p] is validated.~n", [JobTitle]),
+	{SrvInfo, ProcessSrvObj} = case commons:get_srv_obj(Services, process_srv) of
+			{bad, Reason} ->
+					io:format("Exception: ~p.~n", [Reason]),
+					corba:raise(#'JobService_HandlerNotRegistered'{});
+			{ok, Result} -> Result
+	end,
+	io:format("VALIDATE SERVICE: Job[~p] sent to process.~n", [JobTitle]),
+	ProcessStubMod = SrvInfo#service.stub_module,
+	{Res, JobCtx} = ProcessStubMod:process_job(ProcessSrvObj, JobCtx),
+	{reply, {Res, JobCtx}, S}.
+
+
+
+validate_job_item(Jobs, JobCtx) ->
+		ok.
 
 %%----------------------------------------------------------------------
 %% Function   : '_get_hname'/1
@@ -87,7 +108,7 @@ validate_job(State, JobCtx) ->
 %% Description: 
 %%----------------------------------------------------------------------
 '_get_hname'(State) ->
-	{reply, Hname, State}.
+	{reply, ?SERVICE_NAME, State}.
 
 %%----------------------------------------------------------------------
 %% Function   : '_set_hname'/2
@@ -113,8 +134,8 @@ validate_job(State, JobCtx) ->
 %% Raises     : -
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
-init(_Env) ->
-	{ok, #state{}}.
+init(Env) ->
+	{ok, #state{services=Env}}.
 
 
 %%----------------------------------------------------------------------

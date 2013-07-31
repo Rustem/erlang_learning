@@ -4,6 +4,8 @@
 
 module JobService {
 		
+		exception HandlerNotRegistered {};
+
 		interface JobGeoDetails {
 				enum CurrencyEnum {kzt, usd, rub, gbp};
 				enum CountryEnum {kazakhstan, russia, great_britain, usa};
@@ -28,19 +30,23 @@ module JobService {
 
 
 		interface Submitable : JobHandler {
-				Status submit_job(in JobEntitiy JobCtx);
+				Status submit_job(in JobEntitiy JobCtx)
+						raises(HandlerNotRegistered);
 		};
 
 		interface Validateable : JobHandler {
-				Status validate_job(inout JobEntitiy JobCtx);
+				Status validate_job(inout JobEntitiy JobCtx)
+						raises(HandlerNotRegistered);
 		};
 
 		interface Processable : JobHandler {
-				Status process_job(inout JobEntitiy JobCtx);
+				Status process_job(inout JobEntitiy JobCtx)
+						raises(HandlerNotRegistered);
 		};
 
 		interface Storeable : JobHandler {
-				Status store_job(in JobEntitiy JobCtx);
+				Status store_job(in JobEntitiy JobCtx)
+						raises(HandlerNotRegistered);
 		};
 };
 

@@ -26,10 +26,14 @@
          code_change/3,
          handle_info/2]).
 
+
+-define(SERVICE_NAME, "JobServiceProcessable").
 %%----------------------------------------------------------------------
 %% Include Files
 %%----------------------------------------------------------------------
 
+-include("../JobService.hrl").
+-include("../../src/records.hrl").
 
 %%----------------------------------------------------------------------
 %% Macros
@@ -39,7 +43,7 @@
 %%----------------------------------------------------------------------
 %% Records
 %%----------------------------------------------------------------------
--record(state, {}).
+
 
 %%======================================================================
 %% API Functions
@@ -75,8 +79,16 @@
 %% Raises     : 
 %% Description: 
 %%----------------------------------------------------------------------
-process_job(State, JobCtx) ->
-	{reply, {OE_Reply, JobCtx}, State}.
+process_job(S=#state{services=Services, jobs=Jobs},
+						JobCtx=#'JobService_job'{}) ->
+	JobTitle = JobCtx#'JobService_job'.title,
+	ok = process_job_item(JobCtx),
+	io:format("PROCESS SERVICE: Job[~p] processing finished.~n", [JobTitle]),
+	io:format("Job[~p] processed successfully.", [JobTitle]),
+	{reply, {success, JobCtx}, S}.
+
+process_job_item(Job) ->
+		ok.
 
 %%----------------------------------------------------------------------
 %% Function   : '_get_hname'/1
@@ -87,7 +99,7 @@ process_job(State, JobCtx) ->
 %% Description: 
 %%----------------------------------------------------------------------
 '_get_hname'(State) ->
-	{reply, Hname, State}.
+	{reply, ?SERVICE_NAME, State}.
 
 %%----------------------------------------------------------------------
 %% Function   : '_set_hname'/2
@@ -113,8 +125,8 @@ process_job(State, JobCtx) ->
 %% Raises     : -
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
-init(_Env) ->
-	{ok, #state{}}.
+init(Env) ->
+	{ok, #state{services=Env}}.
 
 
 %%----------------------------------------------------------------------

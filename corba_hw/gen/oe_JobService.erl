@@ -30,6 +30,8 @@ oe_register() ->
 
     _OE_1 = oe_get_top_module(OE_IFR, "IDL:JobService:1.0", "JobService", "1.0"),
 
+    orber_ifr:'ModuleDef_create_exception'(_OE_1, "IDL:JobService/HandlerNotRegistered:1.0", "HandlerNotRegistered", "1.0", []),
+
     _OE_2 = orber_ifr:'ModuleDef_create_interface'(_OE_1, "IDL:JobService/JobGeoDetails:1.0", "JobGeoDetails", "1.0", []),
 
     orber_ifr:'InterfaceDef_create_enum'(_OE_2, "IDL:JobService/JobGeoDetails/CurrencyEnum:1.0", "CurrencyEnum", "1.0", ["kzt","usd","rub","gbp"]),
@@ -130,7 +132,7 @@ oe_register() ->
                                                  {tk_sequence,
                                                   {tk_string,146},
                                                   4}}]}), mode='PARAM_IN'}
-], [], []),
+], [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/HandlerNotRegistered:1.0")], []),
 
     _OE_5 = orber_ifr:'ModuleDef_create_interface'(_OE_1, "IDL:JobService/Validateable:1.0", "Validateable", "1.0", [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/JobHandler:1.0")]),
 
@@ -180,7 +182,7 @@ oe_register() ->
                                                  {tk_sequence,
                                                   {tk_string,146},
                                                   4}}]}), mode='PARAM_INOUT'}
-], [], []),
+], [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/HandlerNotRegistered:1.0")], []),
 
     _OE_6 = orber_ifr:'ModuleDef_create_interface'(_OE_1, "IDL:JobService/Processable:1.0", "Processable", "1.0", [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/JobHandler:1.0")]),
 
@@ -230,7 +232,7 @@ oe_register() ->
                                                  {tk_sequence,
                                                   {tk_string,146},
                                                   4}}]}), mode='PARAM_INOUT'}
-], [], []),
+], [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/HandlerNotRegistered:1.0")], []),
 
     _OE_7 = orber_ifr:'ModuleDef_create_interface'(_OE_1, "IDL:JobService/Storeable:1.0", "Storeable", "1.0", [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/JobHandler:1.0")]),
 
@@ -280,7 +282,7 @@ oe_register() ->
                                                  {tk_sequence,
                                                   {tk_string,146},
                                                   4}}]}), mode='PARAM_IN'}
-], [], []),
+], [orber_ifr:lookup_id(OE_IFR,"IDL:JobService/HandlerNotRegistered:1.0")], []),
 
     ok.
 
@@ -293,11 +295,11 @@ register_tests(OE_IFR)->
 
 %% IFR type Re-registration checks.
 re_register_test(OE_IFR)->
-  case orber_ifr:'Repository_lookup_id'(OE_IFR,"IDL:JobService/JobGeoDetails:1.0") of
+  case orber_ifr:'Repository_lookup_id'(OE_IFR,"IDL:JobService/HandlerNotRegistered:1.0") of
     []  ->
       true;
     _ ->
-      exit({allready_registered,"IDL:JobService/JobGeoDetails:1.0"})
+      exit({allready_registered,"IDL:JobService/HandlerNotRegistered:1.0"})
  end.
 
 
@@ -337,6 +339,7 @@ oe_unregister() ->
     oe_destroy(OE_IFR, "IDL:JobService/JobEntitiy:1.0"),
     oe_destroy(OE_IFR, "IDL:JobService/job:1.0"),
     oe_destroy(OE_IFR, "IDL:JobService/JobGeoDetails:1.0"),
+    oe_destroy(OE_IFR, "IDL:JobService/HandlerNotRegistered:1.0"),
     oe_destroy_if_empty(OE_IFR, "IDL:JobService:1.0"),
     ok.
 

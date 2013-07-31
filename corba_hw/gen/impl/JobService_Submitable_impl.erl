@@ -18,6 +18,8 @@
 -export([submit_job/2]).
 -export(['_get_hname'/1, '_set_hname'/2]).
 
+-define(SERVICE_NAME, "SubmitJobHandler").
+
 %%----------------------------------------------------------------------
 %% Internal Exports
 %%----------------------------------------------------------------------
@@ -29,8 +31,8 @@
 %%----------------------------------------------------------------------
 %% Include Files
 %%----------------------------------------------------------------------
-
-
+-include("../JobService.hrl").
+-include("../../src/records.hrl").
 %%----------------------------------------------------------------------
 %% Macros
 %%----------------------------------------------------------------------
@@ -39,7 +41,6 @@
 %%----------------------------------------------------------------------
 %% Records
 %%----------------------------------------------------------------------
--record(state, {}).
 
 %%======================================================================
 %% API Functions
@@ -61,11 +62,33 @@
 %% Returns    : ReturnValue = OE_Reply
 %%              OE_Reply = Status
 %%              Status = 'success' | 'fail' 
-%% Raises     : 
-%% Description: 
+%% Raises     : JobService_HandlerNotRegistered
+%% Description: Initiates pipeline job processing.
 %%----------------------------------------------------------------------
-submit_job(State, JobCtx) ->
-	{reply, OE_Reply, State}.
+% DONE. RAISE in erlang
+% DONE. Refactor errors to corba errors
+% NOTE. supervisor to restart particular server
+% NOTE. mnesia to store it.
+submit_job(
+				S=#state{services=Services, jobs=Jobs},
+				JobCtx=#'JobService_job'{}) ->
+		NewJobs = add_new_job(JobCtx, Jobs),
+		JobTitle = JobCtx#'JobService_job'.title,
+		io:format("SUBMIT SERVICE: added new job: ~p.~n", [JobTitle]),
+		{SrvInfo, ValidSrvObj} = case commons:get_srv_obj(Services, valid_srv) of
+				{bad, Reason} ->
+						io:format("Exception: ~p.~n", [Reason]),
+						corba:raise(#'JobService_HandlerNotRegistered'{});
+				{ok, Result} -> Result
+		end,
+		io:format("SUBMIT SERVICE: job[~p] sent to validate.~n", [JobTitle]),
+		ValidStubMod = SrvInfo#service.stub_module,
+		{Res, _Job} = ValidStubMod:validate_job(ValidSrvObj, JobCtx),
+		{reply, Res, S#state{jobs=NewJobs}}.
+
+add_new_job(JobCtx, Jobs) ->
+		Title = JobCtx#'JobService_job'.title,
+		orddict:append(Title, JobCtx, Jobs).
 
 %%----------------------------------------------------------------------
 %% Function   : '_get_hname'/1
@@ -76,7 +99,7 @@ submit_job(State, JobCtx) ->
 %% Description: 
 %%----------------------------------------------------------------------
 '_get_hname'(State) ->
-	{reply, Hname, State}.
+	{reply, ?SERVICE_NAME, State}.
 
 %%----------------------------------------------------------------------
 %% Function   : '_set_hname'/2
@@ -102,8 +125,8 @@ submit_job(State, JobCtx) ->
 %% Raises     : -
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
-init(_Env) ->
-	{ok, #state{}}.
+init(Env) ->
+	{ok, #state{services=Env}}.
 
 
 %%----------------------------------------------------------------------
