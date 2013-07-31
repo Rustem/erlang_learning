@@ -21,12 +21,12 @@
 get_srv_obj(Services, Key) ->
 		case orddict:find(Key, Services) of
 				error ->
-						{bad, "Meta of Service[~p] is not included into record #service{}.", [Key]};
+						{bad, "Meta of Service " ++ atom_to_list(Key) ++ " is not included into record #service{}."};
 				{ok, SrvInfo} ->
 						{NS, N} = get_empty_component(SrvInfo#service.cosname),
 						case catch 'CosNaming_NamingContext':resolve(NS, N) of
 								{'EXCEPTION', E} ->
-										{bad, "Service[~p] is not registered.", [SrvInfo#service.cosname]};
+										{bad, "Service[" ++ SrvInfo#service.cosname ++ " is not registered."};
 								Obj -> {ok, {SrvInfo, Obj}}
 						end
 		end.
