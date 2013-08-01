@@ -19,7 +19,12 @@
 
 launch_app(DomainName) ->
 		launch_orber(DomainName),
+		job_srv_sup:start_link(),
 		oe_JobService:oe_register().
+
+start_sup() ->
+		{ok, _SupPid} = job_srv_sup:start_link(),
+		ok.
 
 launch_orber(Name) ->
 		mnesia:start(),
@@ -106,12 +111,13 @@ build_env() ->
 		init_service(StoreServiceInfo, Env),
 		{ok, Env}.
 
-init_service(#service{cosname=CosName, stub_module=StubModule, regname=RegName}, Env) ->
-		SrvObjectKey = StubModule:oe_create_link(Env, [{regname, {local, RegName}}]),
-		NS = corba:resolve_initial_references("NameService"),
-		NC = lname_component:set_id(lname_component:create(), CosName),
-		N = lname:insert_component(lname:create(), 1, NC),
-		'CosNaming_NamingContext':bind(NS, N, SrvObjectKey),
+init_service(ServiceMeta=#service{
+				cosname=CosName,
+				stub_module=StubModule,
+				regname=RegName}, Env) ->
+		{SrvPid, SrvRef} = job_srv_sup:add_service(StubModule, RegName, Env),
+		{NS, N} = commons:get_empty_component(CosName),
+		'CosNaming_NamingContext':bind(NS, N, SrvRef),
 		io:format("Service ~p launched and bind to ~p.~n", [RegName, CosName]).
 
 % writeIOR(FileName, IOR) ->

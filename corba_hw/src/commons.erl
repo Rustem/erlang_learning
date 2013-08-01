@@ -36,3 +36,6 @@ get_empty_component(CosName) ->
 		NC = lname_component:set_id(lname_component:create(), CosName),
 		N = lname:insert_component(lname:create(), 1, NC),
 		{NS, N}.
+
+system_log(ServiceName, Msg, Args) ->
+		io:format("~p SERVICE: " ++ Msg ++ ".~n", [ServiceName | Args]).

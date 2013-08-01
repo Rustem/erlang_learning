@@ -74,14 +74,14 @@ submit_job(
 				JobCtx=#'JobService_job'{}) ->
 		NewJobs = add_new_job(JobCtx, Jobs),
 		JobTitle = JobCtx#'JobService_job'.title,
-		io:format("SUBMIT SERVICE: added new job: ~p.~n", [JobTitle]),
+		commons:system_log("SUBMIT", "added new job: ~p", [JobTitle]),
 		{SrvInfo, ValidSrvObj} = case commons:get_srv_obj(Services, valid_srv) of
 				{bad, Reason} ->
 						io:format("Exception: ~p.~n", [Reason]),
 						corba:raise(#'JobService_HandlerNotRegistered'{});
 				{ok, Result} -> Result
 		end,
-		io:format("SUBMIT SERVICE: job[~p] sent to validate.~n", [JobTitle]),
+		commons:system_log("SUBMIT", "job[~p] sent to validate", [JobTitle]),
 		ValidStubMod = SrvInfo#service.stub_module,
 		{Res, _Job} = ValidStubMod:validate_job(ValidSrvObj, JobCtx),
 		{reply, Res, S#state{jobs=NewJobs}}.
@@ -126,6 +126,8 @@ add_new_job(JobCtx, Jobs) ->
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
 init(Env) ->
+	process_flag(trap_exit, true),
+	commons:system_log("SUBMIT", "initialized", []),
 	{ok, #state{services=Env}}.
 
 
@@ -138,6 +140,7 @@ init(Env) ->
 %% Description: Invoked when the object is terminating.
 %%----------------------------------------------------------------------
 terminate(_Reason, _State) ->
+	commons:system_log("SUBMIT", "terminating", []),
 	ok.
 
 
@@ -167,5 +170,6 @@ code_change(_OldVsn, State, _Extra) ->
 %%----------------------------------------------------------------------
 handle_info(_Info, State) ->
 	{noreply, State}.
+
 
 
