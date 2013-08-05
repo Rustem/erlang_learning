@@ -67,7 +67,7 @@
 %%----------------------------------------------------------------------
 % DONE. RAISE in erlang
 % DONE. Refactor errors to corba errors
-% NOTE. supervisor to restart particular server
+% DONE. supervisor to restart particular server
 % NOTE. mnesia to store it.
 submit_job(
 				S=#state{services=Services, jobs=Jobs},
@@ -84,6 +84,7 @@ submit_job(
 		commons:system_log("SUBMIT", "job[~p] sent to validate", [JobTitle]),
 		ValidStubMod = SrvInfo#service.stub_module,
 		{Res, _Job} = ValidStubMod:validate_job(ValidSrvObj, JobCtx),
+		commons:system_log("SUBMIT", "job[~p] has status success", [JobTitle]),
 		{reply, Res, S#state{jobs=NewJobs}}.
 
 add_new_job(JobCtx, Jobs) ->
@@ -127,7 +128,7 @@ add_new_job(JobCtx, Jobs) ->
 %%----------------------------------------------------------------------
 init(Env) ->
 	process_flag(trap_exit, true),
-	commons:system_log("SUBMIT", "initialized", []),
+	commons:system_log("SUBMIT", "service restarted", []),
 	{ok, #state{services=Env}}.
 
 

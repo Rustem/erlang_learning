@@ -31,11 +31,26 @@ get_srv_obj(Services, Key) ->
 						end
 		end.
 
+%%----------------------------------------------------------------------
+%% Function   : get_srv_obj/1
+%% Arguments  : CosName - binary, name of naming context
+%% Returns    : ReturnValue = {NS, N}
+%%              NS = initial name service
+%%              N = naming context with CosName
+%% Description: Returns new naming context to bind object to
 get_empty_component(CosName) ->
 		NS = corba:resolve_initial_references("NameService"),
 		NC = lname_component:set_id(lname_component:create(), CosName),
 		N = lname:insert_component(lname:create(), 1, NC),
 		{NS, N}.
 
+
+%%----------------------------------------------------------------------
+%% Function   : system_log/3
+%% Arguments  : ServiceName = binary, name of service
+%%              Msg = binary, message to log
+%%							Args = list, additional arguments to message
+%% Returns    : ReturnValue = nothing
+%% Description: Logs a system message to console
 system_log(ServiceName, Msg, Args) ->
 		io:format("~p SERVICE: " ++ Msg ++ ".~n", [ServiceName | Args]).

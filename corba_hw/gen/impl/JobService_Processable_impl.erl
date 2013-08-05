@@ -83,8 +83,7 @@ process_job(S=#state{services=Services, jobs=Jobs},
 						JobCtx=#'JobService_job'{}) ->
 	JobTitle = JobCtx#'JobService_job'.title,
 	ok = process_job_item(JobCtx),
-	io:format("PROCESS SERVICE: Job[~p] processing finished.~n", [JobTitle]),
-	io:format("Job[~p] processed successfully.", [JobTitle]),
+	commons:system_log("PROCESS", "job[~p] processed", [JobTitle]),
 	{reply, {success, JobCtx}, S}.
 
 process_job_item(Job) ->
@@ -126,6 +125,8 @@ process_job_item(Job) ->
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
 init(Env) ->
+	process_flag(trap_exit, true),
+	commons:system_log("PROCESS", "service restarted", []),
 	{ok, #state{services=Env}}.
 
 

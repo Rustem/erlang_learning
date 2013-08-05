@@ -82,14 +82,14 @@ validate_job(
 				JobCtx=#'JobService_job'{}) ->
 	ok=validate_job_item(Jobs, JobCtx),
 	JobTitle = JobCtx#'JobService_job'.title,
-	io:format("VALIDATE SERVICE: Job[~p] is validated.~n", [JobTitle]),
+	commons:system_log("VALIDATE", "job[~p] is validated", [JobTitle]),
 	{SrvInfo, ProcessSrvObj} = case commons:get_srv_obj(Services, process_srv) of
 			{bad, Reason} ->
 					io:format("Exception: ~p.~n", [Reason]),
 					corba:raise(#'JobService_HandlerNotRegistered'{});
 			{ok, Result} -> Result
 	end,
-	io:format("VALIDATE SERVICE: Job[~p] sent to process.~n", [JobTitle]),
+	commons:system_log("VALIDATE", "job[~p] sent to process", [JobTitle]),
 	ProcessStubMod = SrvInfo#service.stub_module,
 	{Res, JobCtx} = ProcessStubMod:process_job(ProcessSrvObj, JobCtx),
 	{reply, {Res, JobCtx}, S}.
@@ -135,6 +135,8 @@ validate_job_item(Jobs, JobCtx) ->
 %% Description: Initiates the server
 %%----------------------------------------------------------------------
 init(Env) ->
+	process_flag(trap_exit, true),
+	commons:system_log("VALIDATE", "service restarted", []),
 	{ok, #state{services=Env}}.
 
 

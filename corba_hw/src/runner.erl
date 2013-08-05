@@ -10,20 +10,20 @@
 
 -define(DEFAULT_REGNAME, "JobHandler").
 
-% NOTE. Launch servers (Job Handlers)
-% NOTE. Implement handlers
-% NOTE. Support pipelining {submit: ObjRef1, validate: ObjRef2} in Env
-% NOTE. Supervise and restart in case of failure
-% NOTE. Support pubsub
+% DONE. Launch servers (Job Handlers)
+% DONE. Implement handlers
+% DONE. Support pipelining {submit: ObjRef1, validate: ObjRef2} in Env
+% DONE. Supervise and restart in case of failure
 
+% NOTE. Refactor msgs with commons:system_log/2.
 
 launch_app(DomainName) ->
 		launch_orber(DomainName),
-		job_srv_sup:start_link(),
+		start_sup(),
 		oe_JobService:oe_register().
 
 start_sup() ->
-		{ok, _SupPid} = job_srv_sup:start_link(),
+		job_srv_sup:start_link(),
 		ok.
 
 launch_orber(Name) ->
@@ -48,8 +48,8 @@ reinstall_orber() ->
 				{nameservice_storage_type, ram_copies}]),
 		orber:start().
 
-
-client_test(Env) ->
+%% Test normal
+client_test1(Env) ->
 		{SrvInfo, SubmitSrvObj} = case commons:get_srv_obj(Env, submit_srv) of
 				{bad, Reason} -> throw(Reason);
 				{ok, Result} -> Result
@@ -64,16 +64,54 @@ client_test(Env) ->
 				country=kazakhstan,
 				reqments=["one", "two", "three", "four"],
 				job_details=["1", "2", "3", "4"]},
-
+		commons:system_log("CLIENT", "job was submitted", []),
 		Res = SM:submit_job(
 				SubmitSrvObj, FakeJob),
-		io:format("Job submitted with result: ~p ~n", [Res]).
+		commons:system_log("CLIENT", "job processed successfully", []).
 
-		% oe_JobService:oe_register(),
-		% Obj = corba:string_to_object(readIOR(IORFile)),
-		% Job=#'JobService_job'{'Title'="Do job"},
-		% Res = 'JobService_JobHandler':handle_job(Obj, Job),
-		% io:format("JOB HANDLED: ~p~n", [Res]).
+
+%%    Test with failing server
+client_test2(Env) ->
+		{SrvInfo, SubmitSrvObj} = case commons:get_srv_obj(Env, submit_srv) of
+				{bad, Reason} -> throw(Reason);
+				{ok, Result} -> Result
+		end,
+		#service{cosname=CN, stub_module=SM} = SrvInfo,
+		exit(whereis('JobService_Submitable'), kill),
+		timer:sleep(2000),
+		FakeJob = #'JobService_job'{
+				title="Do prototype",
+				salary=450000,
+				currency=kzt,
+				country=kazakhstan,
+				reqments=["one", "two", "three", "four"],
+				job_details=["1", "2", "3", "4"]},
+		commons:system_log("CLIENT", "job was submitted", []),
+		Res = SM:submit_job(
+				SubmitSrvObj, FakeJob),
+		commons:system_log("CLIENT", "job processed successfully", []).
+
+% raising an exception
+client_test3(OrigEnv) ->
+		Env = orddict:filter(fun(Key, Val) -> Key =/= submit_srv end, OrigEnv),
+		{SrvInfo, SubmitSrvObj} = case commons:get_srv_obj(Env, submit_srv) of
+				{bad, Reason} -> throw(Reason);
+				{ok, Result} -> Result
+		end,
+		#service{cosname=CN, stub_module=SM} = SrvInfo,
+		exit(whereis('JobService_Submitable'), kill),
+		timer:sleep(2000),
+		FakeJob = #'JobService_job'{
+				title="Do prototype",
+				salary=450000,
+				currency=kzt,
+				country=kazakhstan,
+				reqments=["one", "two", "three", "four"],
+				job_details=["1", "2", "3", "4"]},
+		commons:system_log("CLIENT", "job was submitted", []),
+		Res = SM:submit_job(
+				SubmitSrvObj, FakeJob),
+		commons:system_log("CLIENT", "job processed successfully", []).
 
 server_test() ->
 		{ok, Env} = build_env(),
